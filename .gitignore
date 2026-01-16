@@ -1,6 +1,9 @@
 # Config file, so that I can put my paths in there without messing up github
 config.py
 
+# Ignore my file storage
+storage/
+
 # macOS system files
 .DS_Store
 
