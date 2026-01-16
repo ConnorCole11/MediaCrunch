@@ -1,0 +1,22 @@
+# Config file, so that I can put my paths in there without messing up github
+config.py
+
+# macOS system files
+.DS_Store
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+.env
+
+# VS Code workspace settings
+.vscode/
+
+# Media / temporary outputs
+*.mp4
+*.avi
+*.mov
