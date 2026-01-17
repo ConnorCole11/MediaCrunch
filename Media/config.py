@@ -1,5 +1,5 @@
 # Enter absolute paths to:
-class config:
+class Config:
     def __init__(self):
         self.playlist_folder = '...' # the folder with the playlist text files
         self.video_folder = '...' # the folder that holds videos

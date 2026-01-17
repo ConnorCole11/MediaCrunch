@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 
-from ControlPlaylist.ControlPlaylist import ControlPlaylist
+from music.makePlaylist.ControlPlaylist.ControlPlaylist import ControlPlaylist
 
 
 class PlaylistGUI(QWidget):
