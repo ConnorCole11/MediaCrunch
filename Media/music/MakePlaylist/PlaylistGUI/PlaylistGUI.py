@@ -10,10 +10,10 @@ from music.makePlaylist.ControlPlaylist.ControlPlaylist import ControlPlaylist
 
 
 class PlaylistGUI(QWidget):
-    def __init__(self, playlists_dir, songs_dir):
+    def __init__(self, config):
         super().__init__()
-        self.playlists_dir = playlists_dir
-        self.songs_dir = songs_dir
+        self.playlists_dir = config.playlist_folder
+        self.songs_dir = config.song_folder
         self.playlist = None   # instance of ControlPlaylist
 
         self.initWidgets()

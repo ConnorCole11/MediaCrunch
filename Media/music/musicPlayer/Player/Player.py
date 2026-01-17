@@ -5,8 +5,8 @@ import time
 import os
 
 class Player:
-    def __init__(self, playlist_dir, song_folder, on_song_change=None):
-        self.plist_dir = playlist_dir
+    def __init__(self, playlist_file, song_folder, on_song_change=None):
+        self.plist_dir = playlist_file
         self.song_folder = song_folder
 
         # Global Values
