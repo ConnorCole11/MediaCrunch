@@ -1,10 +1,9 @@
+from PyQt5.QtWidgets import QApplication
+from music.musicPlayer.GuiWindow.MainWindow import PlayerWindow  # your new GUI class
 import sys
 import os
 import pygame
-from PyQt5.QtWidgets import QApplication
-from GuiWindow.MainWindow import PlayerWindow  # your new GUI class
 import argparse
-import config
 
 
 def parse_args():
@@ -22,8 +21,7 @@ def parse_args():
     return parser.parse_args()
 
 
-
-if __name__ == "__main__":
+def musicPlayer_main(config):
     args = parse_args()
     plist_txt = args.Playlist
     # Init pygame mixer
@@ -31,7 +29,7 @@ if __name__ == "__main__":
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
     playlist_file = os.path.join(this_dir, config.playlist_folder, plist_txt)
-    songs_folder = os.path.join(this_dir, config.songs_folder)
+    songs_folder = os.path.join(this_dir, config.song_folder)
 
     app = QApplication(sys.argv)
 

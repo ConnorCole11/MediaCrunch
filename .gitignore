@@ -4,6 +4,9 @@ Media/config_local.py
 # Ignore my file storage
 storage/
 
+# Ignore playlists
+*_Playlist.txt
+
 # macOS system files
 .DS_Store
 
