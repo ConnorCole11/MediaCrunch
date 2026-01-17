@@ -1,5 +1,5 @@
 # Editable install with no version control (cc_files==0.1.0)
--e ./cc_utils/cc_files
+-e Media/cc_utils/cc_files
 decorator==5.2.1
 imageio==2.37.0
 imageio-ffmpeg==0.6.0
