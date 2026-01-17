@@ -38,7 +38,7 @@ class TopLevelGUI(QWidget):
         # ------------------
         # Sub-GUIs
         # ------------------
-        self.playlist_selector = PlaylistPicker()
+        self.playlist_selector = PlaylistPicker(config.playlist_folder)
         self.plistmaker = PlaylistGUI(config)
         self.ytDownloader = YouTubeDownloader()
         # self.gui4 = GUI4Window()
