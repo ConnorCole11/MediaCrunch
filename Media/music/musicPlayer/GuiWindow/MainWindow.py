@@ -1,17 +1,15 @@
-import sys
-import os
-import pygame
-from PyQt5.QtWidgets import (
-    QApplication, QWidget, QPushButton, QVBoxLayout,
-    QListWidget, QLabel, QHBoxLayout, QSlider
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+# MainWindow.py
+import sys, os, pygame
+from PyQt5.QtWidgets import QApplication, QWidget, QListWidget
+from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QColor, QBrush
+from PyQt5.QtCore import pyqtSignal
 from music.musicPlayer.Player.Player import Player  # your class
+from music.musicPlayer.GuiWindow.buttons import PlayerControls
+from music.musicPlayer.GuiWindow.controls import StatusWidget, VolumeWidget
+from music.musicPlayer.GuiWindow.layouts import build_main_layout
 
-# ---------------------------
-# Worker thread for playback
-# ---------------------------
+
 class PlayerThread(QThread):
     song_changed = pyqtSignal(int)
     finished = pyqtSignal()
@@ -31,205 +29,113 @@ class PlayerThread(QThread):
         self.finished.emit()
 
 
-# ---------------------------
-# Main Window
-# ---------------------------
 class PlayerWindow(QWidget):
     def __init__(self, playlist_file, song_folder):
         super().__init__()
 
-        self.initPlayer(playlist_file, song_folder)
-        self.initStatus()
-        self.initButtons()
-        self.initVolume()
-        self.initUI()
-        self.applyStyles()
+        # Player
+        self.player = Player(playlist_file, song_folder,
+                             on_song_change=lambda idx: (
+                                 self.highlight_current_song(idx),
+                                 self.status.set_song(os.path.basename(self.player.song_dirs[idx]))
+                             ))
+        self.player.get_songs()
+        pygame.mixer.init()
 
-        self.setWindowTitle("Music Player")
-
-    
+        # Widgets
+        self.status = StatusWidget()
+        self.volume = VolumeWidget()
+        self.controls = PlayerControls()
+        self.playlist = QListWidget()
 
         for s in self.player.song_dirs:
             self.playlist.addItem(os.path.basename(s))
 
-        # Background thread
+        # Layout
+        self.setLayout(build_main_layout(self.status, self.playlist, self.controls, self.volume))
+        self.apply_styles()
+        self.setWindowTitle("Music Player")
+
+        # Connect button signals
+        self.controls.playClicked.connect(self.start_or_resume)
+        self.controls.pauseClicked.connect(self.pause)
+        self.controls.skipClicked.connect(self.skip)
+        self.controls.backClicked.connect(self.back)
+        self.controls.loopClicked.connect(self.loop)
+        self.controls.restartClicked.connect(self.restart)
+
+        # Thread
         self.thread = PlayerThread(self.player)
-        self.thread.error.connect(self.thread_error)
         self.thread.song_changed.connect(self.highlight_current_song)
-        self.thread.song_changed.connect(self.updateSongStatus)
+        self.thread.song_changed.connect(lambda idx: self.status.set_song(os.path.basename(self.player.song_dirs[idx])))
+        self.thread.error.connect(self.thread_error)
 
-        self.highlight_color = "#00CCFF"  # Default highlight color
+        self.highlight_color = "#00CCFF"
 
-    def initPlayer(self, playlist_file, song_folder):
-        self.player = Player(
-            playlist_file, 
-            song_folder, 
-            on_song_change=lambda idx: (
-                self.highlight_current_song(idx),
-                self.updateSongStatus(idx)
-            )
-        )
-        self.player.get_songs()
-        pygame.mixer.init()
+        # Volume slider
+        self.volume.slider.sliderReleased.connect(self.commit_volume)
 
-    def initUI(self):
-        self.playlist = QListWidget()
+        # Playlist double click
         self.playlist.itemDoubleClicked.connect(self.jump_to_song)
 
-        self.initStatus()
-        self.mainBuild()
-
-    def initStatus(self):
-        status_layout = QVBoxLayout()
-
-        self.status_song = QLabel("Song: None")
-        self.status_paused = QLabel("Paused: ❌")
-        self.status_loop = QLabel("Looping: ❌")
-        status_layout.addWidget(self.status_song)
-        status_layout.addWidget(self.status_paused)
-        status_layout.addWidget(self.status_loop)
-
-    def initButtons(self):
-        # Buttons
-        self.btn_play = QPushButton("▶ Play")
-        self.btn_pause = QPushButton("⏸ Pause")
-        self.btn_skip = QPushButton("⏭ Skip")
-        self.btn_back = QPushButton("⏮ Back")
-        self.btn_restart = QPushButton("⭮ Restart") 
-        self.btn_loop = QPushButton("Loop")
-
-        # Functions of buttons
-        self.btn_play.clicked.connect(self.start_or_resume)
-        self.btn_pause.clicked.connect(self.pause)
-        self.btn_skip.clicked.connect(self.skip)
-        self.btn_back.clicked.connect(self.back)
-        self.btn_restart.clicked.connect(self.restart)
-        self.btn_loop.clicked.connect(self.loop)
-
-
-    def initVolume(self):
-        self.volume_slider = QSlider(Qt.Horizontal)
-        self.volume_slider.setMinimum(0)
-        self.volume_slider.setMaximum(100)
-        self.volume_slider.setValue(50)  # default volume
-        self.volume_slider.setTickInterval(10)
-        self.volume_slider.setTickPosition(QSlider.TicksBelow)
-
-        # Initial volume of slider
-        pygame.mixer.music.set_volume(self.volume_slider.value() / 100)
-
-    def applyStyles(self):
+    # ----------------------
+    # UI helpers
+    # ----------------------
+    def apply_styles(self):
         self.playlist.setStyleSheet("""
             QListWidget::item:selected {
-                background: rgba(0, 120, 215, 100);  /* semi-transparent blue */
+                background: rgba(0, 120, 215, 100);
                 color: black;
             }
-            """)
+        """)
 
+    def highlight_current_song(self, index):
+        for i in range(self.playlist.count()):
+            self.playlist.item(i).setBackground(QBrush(QColor("white")))
+        if 0 <= index < self.playlist.count():
+            item = self.playlist.item(index)
+            item.setBackground(QBrush(QColor(self.highlight_color)))
+            self.playlist.setCurrentRow(index)
+            self.playlist.scrollToItem(item)
 
-    # ===========================
-    # Build UI
-    # ===========================
-    def mainBuild(self):
-        btn_row = self.buildButtonRow()
-        vol_row = self.buildVolumeRow()
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.status_song)
-        layout.addWidget(self.status_paused)
-        layout.addWidget(self.status_loop)
-        layout.addWidget(self.playlist)
-        layout.addLayout(btn_row)
-        layout.addLayout(vol_row)
-
-        self.setLayout(layout)
-
-    def buildButtonRow(self):
-        row = QHBoxLayout()
-        row.addWidget(self.btn_back)
-        row.addWidget(self.btn_loop)
-        row.addWidget(self.btn_restart)
-        row.addWidget(self.btn_pause)
-        row.addWidget(self.btn_play)
-        row.addWidget(self.btn_skip)
-        return row
-
-    def buildVolumeRow(self):
-        volume_layout = QHBoxLayout()
-        volume_label = QLabel("Volume:")
-        volume_layout.addWidget(volume_label)
-        volume_layout.addWidget(self.volume_slider)
-
-        self.volume_slider.sliderReleased.connect(self.commit_volume)
-        return volume_layout
-
-
-    # --------------------------
-    # Button Handlers
-    # --------------------------
-
-    def updateLoopEmoji(self):
-        if self.player.loop == True:
-            emoji = "✅"
-        else:
-            emoji = "❌"
-        self.status_loop.setText(f"Looped: {emoji}")
-        return emoji
-    
-
-
-    def updateSongStatus(self, index=None):
-        if index is None:
-            index = self.player.current_idx
-        if 0 <= index < len(self.player.song_dirs):
-            song_path = self.player.song_dirs[index]
-            song_name = os.path.basename(song_path)
-            self.status_song.setText(f"Song: {song_name}")
-        else:
-            self.status_song.setText("Song: None")
-
-    # ===========================
-    # Button Handlers (cleaned)
-    # ===========================
+    # ----------------------
+    # Button handlers
+    # ----------------------
     def start_or_resume(self):
         if not self.thread.isRunning():
             self.thread.start()
         else:
             self.player.unpause()
             pygame.mixer.music.unpause()
-        self.status_paused.setText("Paused: ❌")
-        self.updateLoopEmoji()
+        self.status.set_paused(False)
 
     def pause(self):
         self.player.pause()
         pygame.mixer.music.pause()
-        self.status_paused.setText("Paused: ✅")
+        self.status.set_paused(True)
 
     def skip(self):
         self.player.skip()
         self.player.pause_song = False
         self.player.loop = False
-        self.status_paused.setText("Paused: ❌")
-        self.updateLoopEmoji()
+        self.status.set_paused(False)
 
     def back(self):
         self.player.back()
         self.player.pause_song = False
         self.player.loop = False
-        self.status_paused.setText("Paused: ❌")
-        self.updateLoopEmoji()
+        self.status.set_paused(False)
 
     def restart(self):
         self.player.skip_song = True
         self.player.skip_n_songs = 0
         self.player.pause_song = False
         pygame.mixer.music.unpause()
-        self.status_paused.setText("Paused: ❌")
-        self.updateLoopEmoji()
+        self.status.set_paused(False)
 
     def loop(self):
         self.player.tog_loop()
-        self.updateLoopEmoji()
+        self.status.set_loop(self.player.loop)
 
     def jump_to_song(self, item):
         name = item.text().lower()
@@ -243,32 +149,11 @@ class PlayerWindow(QWidget):
                 pygame.mixer.music.unpause()
                 break
 
-
-    def preview_volume(self, value):
-        # This runs WHILE dragging — optional
-        pygame.mixer.music.set_volume(value / 100)
-
     def commit_volume(self):
-        # This runs AFTER clicking or finishing a drag — stable
-        value = self.volume_slider.value()
+        value = self.volume.slider.value()
         pygame.mixer.music.set_volume(value / 100)
         self.player.volume = value / 100
 
-    # --------------------------
-    # Highlight currently playing
-    # --------------------------
-    def highlight_current_song(self, index):
-        for i in range(self.playlist.count()):
-            self.playlist.item(i).setBackground(QBrush(QColor("white")))
-
-        if 0 <= index < self.playlist.count():
-            item = self.playlist.item(index)
-            item.setBackground(QBrush(QColor(self.highlight_color)))
-            self.playlist.setCurrentRow(index)
-            self.playlist.scrollToItem(item)
-            # self.now_playing.setText(f"Playing: {os.path.basename(self.player.song_dirs[index])}")
-
     def thread_error(self, msg):
-        # self.now_playing.setText("Error!")
         print("Thread error:", msg)
 

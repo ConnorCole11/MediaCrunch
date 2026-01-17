@@ -10,5 +10,5 @@ from ytDownload.main import ytDownload_main
 
 config = Config()
 # makePlaylist_main(config)
-# musicPlayer_main(config)
-ytDownload_main()
+musicPlayer_main(config)
+# ytDownload_main()
