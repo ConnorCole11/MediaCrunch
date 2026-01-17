@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from PlaylistGUI.PlaylistGUI import PlaylistGUI
 
-if __name__ == "__main__":
+def makePlaylist_main():
     app = QApplication(sys.argv)
 
     playlists_dir = "../Playlists"
