@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QComboBox, QTextEdit, QFileDialog, QMessageBox
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from DownloadThread.DownloadThread import DownloadThread as DT
+from ytDownload.DownloadThread.DownloadThread import DownloadThread as DT
 
 class YouTubeDownloader(QWidget):
     def __init__(self):
