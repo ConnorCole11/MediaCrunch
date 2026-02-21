@@ -61,7 +61,9 @@ class PlayerWindow(QWidget):
         self.player.songChanged.connect(
             lambda idx: self.header_section.set_title(os.path.basename(self.player.song_dirs[idx]))
         )
-        self.player.pausedChanged.connect(self.header_section.set_paused)
+        self.settings_section.shuffleClicked.connect(self.player.shuffle_songs)
+        self.player.shuffleChanged.connect(self.header_section.set_shuffle)
+        self.player.shuffleChanged.connect(lambda _: self.song_section.set_songs(self.player.song_dirs))
 
     # ----------------------
     # Button handlers

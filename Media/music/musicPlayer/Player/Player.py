@@ -3,6 +3,7 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 from mutagen.mp3 import MP3
 import pygame
+import random
 import time
 import os
 
@@ -10,6 +11,7 @@ import os
 class Player(QObject):
     songChanged = pyqtSignal(int)
     pausedChanged = pyqtSignal(bool)
+    shuffleChanged = pyqtSignal(bool)
 
     def __init__(self, playlist_file, song_folder):
         super().__init__()
@@ -27,6 +29,7 @@ class Player(QObject):
         self.current_idx = 0
         self.error_message = ""
         self.volume = 0.5
+        self.shuffle = False
 
     def get_songs(self):
         with open(self.plist_dir, "r", encoding="utf-8") as f:
@@ -36,6 +39,18 @@ class Player(QObject):
             for line in lines if line.endswith(".mp3")
         ]
         return self.song_dirs
+    
+    def shuffle_songs(self):
+        self.shuffle = not self.shuffle
+        self.shuffleChanged.emit(self.shuffle)  # update UI label
+        if self.shuffle:
+            random.shuffle(self.song_dirs)
+        else:
+            self.get_songs()  # reset to original order
+
+        self.current_idx = 0
+        self.songChanged.emit(self.current_idx)  # highlight first song in new order
+
 
     @staticmethod
     def get_mp3_duration(song):

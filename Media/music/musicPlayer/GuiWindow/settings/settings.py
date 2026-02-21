@@ -11,6 +11,7 @@ class Settings(QWidget):
     backClicked = pyqtSignal()
     loopClicked = pyqtSignal()
     restartClicked = pyqtSignal()
+    shuffleClicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -22,6 +23,7 @@ class Settings(QWidget):
         self.btn_back = QPushButton("⏮ Back")
         self.btn_restart = QPushButton("⭮ Restart")
         self.btn_loop = QPushButton("Loop")
+        self.btn_shuffle = QPushButton("Shuffle")
 
         # Connect buttons
         self.btn_play.clicked.connect(self.playClicked.emit)
@@ -30,12 +32,18 @@ class Settings(QWidget):
         self.btn_back.clicked.connect(self.backClicked.emit)
         self.btn_loop.clicked.connect(self.loopClicked.emit)
         self.btn_restart.clicked.connect(self.restartClicked.emit)
+        self.btn_shuffle.clicked.connect(self.shuffleClicked.emit)
 
         # Button layout (horizontal)
         button_layout = QHBoxLayout()
-        for btn in (self.btn_back, self.btn_loop, self.btn_restart,
-                    self.btn_pause, self.btn_play, self.btn_skip):
-            button_layout.addWidget(btn)
+        button_layout.addWidget(self.btn_back)
+        button_layout.addWidget(self.btn_loop)
+        button_layout.addWidget(self.btn_restart)
+        button_layout.addWidget(self.btn_pause)
+        button_layout.addWidget(self.btn_play)
+        button_layout.addWidget(self.btn_skip)
+        button_layout.addWidget(self.btn_shuffle)
+
 
         # Volume slider
         self.volume = QSlider()

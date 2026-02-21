@@ -11,11 +11,13 @@ class Headers(QWidget):
         self.title = QLabel("No song selected. Select a song by double clicking.")
         self.paused = QLabel("Paused: ❌")
         self.looped = QLabel("Loop: ❌")
+        self.shuffle_label = QLabel("Shuffle: ❌")
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.paused)
         self.layout.addWidget(self.looped)
+        self.layout.addWidget(self.shuffle_label)
 
     # slots (methods receiving signals)
     def set_title(self, name):
@@ -26,3 +28,6 @@ class Headers(QWidget):
 
     def set_loop(self, looped: bool):
         self.looped.setText(f"Loop: {'✅' if looped else '❌'}")
+
+    def set_shuffle(self, shuffled: bool):
+        self.shuffle_label.setText(f"Shuffle: {'✅' if shuffled else '❌'}")

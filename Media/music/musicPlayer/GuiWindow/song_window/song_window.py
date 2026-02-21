@@ -33,11 +33,34 @@ class SongWindow(QWidget):
         index = self.playlist.row(item)
         self.songSelected.emit(index)
 
+    # def highlight_current_song(self, index):
+    #     for i in range(self.playlist.count()):
+    #         self.playlist.item(i).setBackground(QBrush(QColor("white")))
+    #     if 0 <= index < self.playlist.count():
+    #         item = self.playlist.item(index)
+    #         item.setBackground(QBrush(QColor(self.highlight_color)))
+    #         self.playlist.setCurrentRow(index)
+    #         self.playlist.scrollToItem(item)
+
+    # SongWindow.py
     def highlight_current_song(self, index):
+        if not (0 <= index < len(self.player.song_dirs)):
+            return
+
+        current_song_name = os.path.basename(self.player.song_dirs[index])
+
         for i in range(self.playlist.count()):
-            self.playlist.item(i).setBackground(QBrush(QColor("white")))
-        if 0 <= index < self.playlist.count():
-            item = self.playlist.item(index)
-            item.setBackground(QBrush(QColor(self.highlight_color)))
-            self.playlist.setCurrentRow(index)
-            self.playlist.scrollToItem(item)
+            item = self.playlist.item(i)
+            item.setBackground(QBrush(QColor("white")))  # reset
+
+            if item.text() == current_song_name:
+                item.setBackground(QBrush(QColor(self.highlight_color)))
+                self.playlist.setCurrentRow(i)
+                self.playlist.scrollToItem(item)
+
+    # SongWindow.py
+    def set_songs(self, song_list):
+        """Replace the QListWidget items with the new song order"""
+        self.playlist.clear()
+        for s in song_list:
+            self.playlist.addItem(os.path.basename(s))
