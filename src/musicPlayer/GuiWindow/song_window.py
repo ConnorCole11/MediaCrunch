@@ -4,7 +4,7 @@ from PyQt5.QtGui import QColor, QBrush
 import os
 
 class SongWindow(QWidget):
-    songSelected = pyqtSignal(int)  # emitted when user double-clicks a song
+    songClicked = pyqtSignal(int)  # emitted when user double-clicks a song
 
     def __init__(self, player):
         super().__init__()
@@ -32,7 +32,7 @@ class SongWindow(QWidget):
         """Emit a signal when song is double clicked."""
         # emit the index to PlayerWindow
         index = self.playlist.row(item)
-        self.songSelected.emit(index)
+        self.songClicked.emit(index)
 
     # SongWindow.py
     def highlight_current_song(self, index):

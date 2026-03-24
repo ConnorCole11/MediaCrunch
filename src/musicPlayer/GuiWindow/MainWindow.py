@@ -1,7 +1,7 @@
 import sys, os, pygame
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from PyQt5.QtCore import QThread, pyqtSignal
-from src.musicPlayer.GuiWindow.Player import Player
+from src.musicPlayer.Player.Player import Player
 from src.musicPlayer.GuiWindow.headers import Headers
 from src.musicPlayer.GuiWindow.settings import Settings
 from src.musicPlayer.GuiWindow.song_window import SongWindow
@@ -50,8 +50,9 @@ class PlayerWindow(QWidget):
         self.settings_section.loopClicked.connect(self.loop)
         self.settings_section.restartClicked.connect(self.restart)
         self.settings_section.volume.sliderReleased.connect(self.commit_volume)
+        self.settings_section.shuffleClicked.connect(self.shuffle)
 
-        self.song_section.songSelected.connect(self.jump_to_song)
+        self.song_section.songClicked.connect(self.player.jump_to_song)
 
         # Thread
         self.thread = PlayerThread(self.player)
@@ -61,9 +62,7 @@ class PlayerWindow(QWidget):
         self.player.songChanged.connect(
             lambda idx: self.header_section.set_title(os.path.basename(self.player.song_dirs[idx]))
         )
-        self.settings_section.shuffleClicked.connect(self.player.shuffle_songs)
-        self.player.shuffleChanged.connect(self.header_section.set_shuffle)
-        self.player.shuffleChanged.connect(lambda _: self.song_section.set_songs(self.player.song_dirs))
+        # self.settings_.shuffleChanged.connect(lambda _: self.song_section.set_songs(self.player.song_dirs))
 
     # ----------------------
     # Button handlers
@@ -83,39 +82,43 @@ class PlayerWindow(QWidget):
 
     def skip(self):
         self.player.skip()
-        self.player.pause_song = False
-        self.player.loop = False
+        self.player.ps.pause_song = False
+        self.player.ps.loop = False
         self.header_section.set_paused(False)
 
     def back(self):
         self.player.back()
-        self.player.pause_song = False
-        self.player.loop = False
+        self.player.ps.pause_song = False
+        self.player.ps.loop = False
         self.header_section.set_paused(False)
 
     def restart(self):
-        self.player.skip_song = True
-        self.player.skip_n_songs = 0
-        self.player.pause_song = False
+        self.player.ps.skip_song = True
+        self.player.ps.skip_n_songs = 0
+        self.player.ps.pause_song = False
         pygame.mixer.music.unpause()
         self.header_section.set_paused(False)
 
     def loop(self):
         self.player.tog_loop()
-        self.header_section.set_loop(self.player.loop)
+        self.header_section.set_loop(self.player.ps.loop)
 
-    def jump_to_song(self, index: int):
-        diff = index - self.player.current_idx
-        self.player.skip_n_songs = diff
-        self.player.pause_song = False
-        self.player.loop = False
-        self.player.skip_song = True
-        pygame.mixer.music.unpause()
+    def shuffle(self):
+        self.player.change_shuffle()
+        self.header_section.set_shuffle(self.player.ps.shuffle)
+
+    # def jump_to_song(self, index: int):
+    #     diff = index - self.player.ps.current_idx
+    #     self.player.ps.skip_n_songs = diff
+    #     self.player.ps.pause_song = False
+    #     self.player.ps.loop = False
+    #     self.player.ps.skip_song = True
+    #     pygame.mixer.music.unpause()
 
     def commit_volume(self):
         value = self.settings_section.volume.value()
         pygame.mixer.music.set_volume(value / 100)
-        self.player.volume = value / 100
+        self.player.ps.volume = value / 100
 
     def thread_error(self, msg):
         print("Thread error:", msg)
