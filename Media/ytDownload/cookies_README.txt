@@ -1,1 +1,0 @@
-Download the chrome extension "cookie getter" whatever it's called, and use it to download a cookies file into THIS location. It is needed to download files automatically, due to some of youtube's anti-bot policies. You don't need to replace this file often. You will need to point the config.py file to whatever your cookie path/to/filename is.

@@ -32,23 +32,30 @@ class Player(QObject):
         self.shuffle = False
 
     def get_songs(self):
+        """Sets self.song_dirs to be a list of the filenames in the song folder."""
         with open(self.plist_dir, "r", encoding="utf-8") as f:
             lines = [line.strip() for line in f if line.strip()]
-        self.song_dirs = [
+        song_dirs = [
             os.path.join(self.song_folder, line)
             for line in lines if line.endswith(".mp3")
         ]
-        return self.song_dirs
+        self.normal_song_dirs = song_dirs.copy()
+        self.song_dirs = song_dirs.copy()
     
     def shuffle_songs(self):
+        """Randomizes the song order if self.shuffle == True. If it's false, the song order returns to normal. Sends signal of the boolean
+        so that the header '✅/❌' can be updated."""
         self.shuffle = not self.shuffle
         self.shuffleChanged.emit(self.shuffle)  # update UI label
+
+        current_song = self.song_dirs[self.current_idx]
+
         if self.shuffle:
             random.shuffle(self.song_dirs)
         else:
-            self.get_songs()  # reset to original order
+            self.song_dirs = self.normal_song_dirs.copy()  # reset to original order
 
-        self.current_idx = 0
+        self.current_idx = self.song_dirs.index(current_song)
         self.songChanged.emit(self.current_idx)  # highlight first song in new order
 
 

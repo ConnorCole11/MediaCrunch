@@ -3,9 +3,9 @@ try:
 except ImportError: 
     from config import Config
 
-from music.makePlaylist.main import makePlaylist_main
-from music.musicPlayer.main import musicPlayer_main
-from ytDownload.main import ytDownload_main
+from src.playlistEditor.makePlaylist.playlistMakerMain import makePlaylist_main
+from src.musicPlayer.musicPlayerMain import musicPlayer_main
+from src.ytDownloader.ytDownloadMain import ytDownload_main
 # mediaEdit is not yet implemented
 
 
@@ -16,7 +16,7 @@ from ytDownload.main import ytDownload_main
 # main.py (top-level entry point)
 import sys
 from PyQt5.QtWidgets import QApplication
-from MasterGUI import TopLevelGUI  # This is the master GUI with sidebar & playlist selector
+from src.MasterGUI import TopLevelGUI  # This is the master GUI with sidebar & playlist selector
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

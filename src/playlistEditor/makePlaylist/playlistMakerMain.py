@@ -1,7 +1,7 @@
 # main.py
 import sys
 from PyQt5.QtWidgets import QApplication
-from music.makePlaylist.PlaylistGUI.PlaylistGUI import PlaylistGUI
+from src.playlistEditor.makePlaylist import PlaylistGUI
 
 def makePlaylist_main(config):
     app = QApplication(sys.argv)

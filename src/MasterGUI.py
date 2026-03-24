@@ -3,10 +3,10 @@ from PyQt5.QtWidgets import (
     QApplication, QWidget, QListWidget, QHBoxLayout, QStackedWidget
 )
 
-from music.musicPlayer.GuiWindow.MainWindow import PlayerWindow
-from music.musicPlayer.GuiWindow.PlaylistPicker import PlaylistPicker
-from music.makePlaylist.PlaylistGUI.PlaylistGUI import PlaylistGUI
-from ytDownload.YoutubeDownloader.YoutubeDownloader import YouTubeDownloader
+from src.musicPlayer.GuiWindow.MainWindow import PlayerWindow
+from src.musicPlayer.GuiWindow.PlaylistPicker import PlaylistPicker
+from src.playlistEditor.makePlaylist.PlaylistGUI import PlaylistGUI
+from src.ytDownloader.YoutubeDownloader import YouTubeDownloader
 # from GUI4.MainWindow import GUI4Window
 
 
@@ -41,7 +41,7 @@ class TopLevelGUI(QWidget):
         self.playlist_selector = PlaylistPicker(config.playlist_folder)
         self.plistmaker = PlaylistGUI(config)
         self.ytDownloader = YouTubeDownloader()
-        # self.gui4 = GUI4Window()
+        # self.editor = GUI4Window()
 
         self.player_gui = None  # 🔑 IMPORTANT: persistent PlayerWindow
 
@@ -51,7 +51,7 @@ class TopLevelGUI(QWidget):
         self.stack.addWidget(self.playlist_selector)  # index 0
         self.stack.addWidget(self.plistmaker)         # index 1
         self.stack.addWidget(self.ytDownloader)       # index 2
-        # self.stack.addWidget(self.gui4)              # index 3
+        # self.stack.addWidget(self.editor)              # index 3
 
         # ------------------
         # Layout

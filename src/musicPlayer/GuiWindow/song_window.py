@@ -25,22 +25,14 @@ class SongWindow(QWidget):
 
     def populate_songs(self):
         self.playlist.clear()
-        for s in self.player.song_dirs:
+        for s in self.player.normal_song_dirs:
             self.playlist.addItem(os.path.basename(s))
 
     def handle_double_click(self, item):
+        """Emit a signal when song is double clicked."""
         # emit the index to PlayerWindow
         index = self.playlist.row(item)
         self.songSelected.emit(index)
-
-    # def highlight_current_song(self, index):
-    #     for i in range(self.playlist.count()):
-    #         self.playlist.item(i).setBackground(QBrush(QColor("white")))
-    #     if 0 <= index < self.playlist.count():
-    #         item = self.playlist.item(index)
-    #         item.setBackground(QBrush(QColor(self.highlight_color)))
-    #         self.playlist.setCurrentRow(index)
-    #         self.playlist.scrollToItem(item)
 
     # SongWindow.py
     def highlight_current_song(self, index):
