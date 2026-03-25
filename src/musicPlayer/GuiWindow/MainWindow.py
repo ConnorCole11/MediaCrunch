@@ -53,6 +53,7 @@ class PlayerWindow(QWidget):
         self.settings_section.shuffleClicked.connect(self.shuffle)
 
         self.song_section.songClicked.connect(self.player.jump_to_song)
+        
 
         # Thread
         self.thread = PlayerThread(self.player)
@@ -82,21 +83,14 @@ class PlayerWindow(QWidget):
 
     def skip(self):
         self.player.skip()
-        self.player.ps.pause_song = False
-        self.player.ps.loop = False
         self.header_section.set_paused(False)
 
     def back(self):
         self.player.back()
-        self.player.ps.pause_song = False
-        self.player.ps.loop = False
         self.header_section.set_paused(False)
 
     def restart(self):
-        self.player.ps.skip_song = True
-        self.player.ps.skip_n_songs = 0
-        self.player.ps.pause_song = False
-        pygame.mixer.music.unpause()
+        self.player.restart()
         self.header_section.set_paused(False)
 
     def loop(self):
@@ -107,18 +101,10 @@ class PlayerWindow(QWidget):
         self.player.change_shuffle()
         self.header_section.set_shuffle(self.player.ps.shuffle)
 
-    # def jump_to_song(self, index: int):
-    #     diff = index - self.player.ps.current_idx
-    #     self.player.ps.skip_n_songs = diff
-    #     self.player.ps.pause_song = False
-    #     self.player.ps.loop = False
-    #     self.player.ps.skip_song = True
-    #     pygame.mixer.music.unpause()
-
     def commit_volume(self):
-        value = self.settings_section.volume.value()
-        pygame.mixer.music.set_volume(value / 100)
-        self.player.ps.volume = value / 100
+        value = self.settings_section.volume.value() / 100
+        self.player.set_volume(value) 
+        pygame.mixer.music.set_volume(value)
 
     def thread_error(self, msg):
         print("Thread error:", msg)

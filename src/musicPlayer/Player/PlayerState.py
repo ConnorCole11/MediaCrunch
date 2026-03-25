@@ -16,6 +16,7 @@ class PlayerState:
         self.error_message = ""
         self.volume = 0.5
         self.shuffle = False
+        self.jump_to_index = None
 
         self.current_song = None
         self.current_song_name = None

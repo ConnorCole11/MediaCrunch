@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QListWidgetItem
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor, QBrush
 import os
 
 class SongWindow(QWidget):
-    songClicked = pyqtSignal(int)  # emitted when user double-clicks a song
+    songClicked = pyqtSignal(str)  # emitted when user double-clicks a song
 
     def __init__(self, player):
         super().__init__()
@@ -25,16 +25,15 @@ class SongWindow(QWidget):
 
     def populate_songs(self):
         self.playlist.clear()
-        for s in self.player.normal_song_dirs:
-            self.playlist.addItem(os.path.basename(s))
+        for s in self.player.song_dirs:  # use current list
+            item = QListWidgetItem(os.path.basename(s))
+            item.setData(1, s)  # store full path (Qt.UserRole = 1)
+            self.playlist.addItem(item)
 
     def handle_double_click(self, item):
-        """Emit a signal when song is double clicked."""
-        # emit the index to PlayerWindow
-        index = self.playlist.row(item)
-        self.songClicked.emit(index)
+        song_path = item.data(1)  # 🔥 get actual stored path
+        self.songClicked.emit(song_path)
 
-    # SongWindow.py
     def highlight_current_song(self, index):
         if not (0 <= index < len(self.player.song_dirs)):
             return
@@ -50,9 +49,9 @@ class SongWindow(QWidget):
                 self.playlist.setCurrentRow(i)
                 self.playlist.scrollToItem(item)
 
-    # SongWindow.py
     def set_songs(self, song_list):
-        """Replace the QListWidget items with the new song order"""
         self.playlist.clear()
         for s in song_list:
-            self.playlist.addItem(os.path.basename(s))
+            item = QListWidgetItem(os.path.basename(s))
+            item.setData(1, s)
+            self.playlist.addItem(item)
