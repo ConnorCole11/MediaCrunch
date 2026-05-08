@@ -7,8 +7,6 @@ class VideoInfo:
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"{filepath} does not exist")
         self.filepath = filepath
-        self.info = self._get_ffprobe_info()
-        self._parse_info()
 
     def _get_ffprobe_info(self):
         """Run ffprobe to get video information in JSON format"""

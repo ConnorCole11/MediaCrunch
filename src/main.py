@@ -3,6 +3,16 @@ try:
 except ImportError: 
     from config import Config
 
+from src.playlistEditor.makePlaylist.playlistMakerMain import makePlaylist_main
+from src.musicPlayer.musicPlayerMain import musicPlayer_main
+from src.ytDownloader.ytDownloadMain import ytDownload_main
+# mediaEdit is not yet implemented
+
+
+# makePlaylist_main(config)
+# musicPlayer_main(config)
+# ytDownload_main()
+
 # main.py (top-level entry point)
 import sys
 from PyQt5.QtWidgets import QApplication

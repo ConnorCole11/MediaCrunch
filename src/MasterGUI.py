@@ -7,7 +7,7 @@ from src.musicPlayer.GuiWindow.MainWindow import PlayerWindow
 from src.musicPlayer.GuiWindow.PlaylistPicker import PlaylistPicker
 from src.playlistEditor.makePlaylist.PlaylistGUI import PlaylistGUI
 from src.ytDownloader.YoutubeDownloader import YouTubeDownloader
-# from GUI4.MainWindow import GUI4Window
+from src.mediaEdit.videoEdit.ConfigQT.ConfigQT import ConfigUI
 
 
 class TopLevelGUI(QWidget):
@@ -25,7 +25,7 @@ class TopLevelGUI(QWidget):
             "Music Player",
             "Playlist Maker",
             "ytDownloader",
-            "mediaEdit (not implemented)"
+            "mediaEdit"
         ])
         self.sidebar.setFixedWidth(200)
         self.sidebar.currentRowChanged.connect(self.switch_gui)
@@ -41,7 +41,7 @@ class TopLevelGUI(QWidget):
         self.playlist_selector = PlaylistPicker(config.playlist_folder)
         self.plistmaker = PlaylistGUI(config)
         self.ytDownloader = YouTubeDownloader()
-        # self.editor = GUI4Window()
+        self.mediaEditor = ConfigUI()
 
         self.player_gui = None  # 🔑 IMPORTANT: persistent PlayerWindow
 
@@ -51,7 +51,7 @@ class TopLevelGUI(QWidget):
         self.stack.addWidget(self.playlist_selector)  # index 0
         self.stack.addWidget(self.plistmaker)         # index 1
         self.stack.addWidget(self.ytDownloader)       # index 2
-        # self.stack.addWidget(self.editor)              # index 3
+        self.stack.addWidget(self.mediaEditor)              # index 3
 
         # ------------------
         # Layout

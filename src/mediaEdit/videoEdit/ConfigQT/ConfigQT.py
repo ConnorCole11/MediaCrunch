@@ -5,8 +5,9 @@ from PyQt5.QtWidgets import (
 )
 import sys
 import os
-from VideoFormatter.VideoFormatter import MP4matter
-from VideoEditor.VideoEditor import VideoEditor
+from src.mediaEdit.videoEdit.VideoFormatter.VideoFormatter import MP4matter
+from src.mediaEdit.videoEdit.VideoEditor.VideoEditor import VideoEditor
+from src.mediaEdit.videoEdit.VideoRead.VideoRead import VideoInfo as vinfo
 
 class ConfigUI(QWidget):
     """
@@ -30,6 +31,22 @@ class ConfigUI(QWidget):
         self.input_path = None
 
         self.init_ui()
+
+    def apply_video_defaults(self, info):
+        """Populate UI fields from VideoInfo."""
+
+        if hasattr(info, "fps"):
+            self.widgets["fps"].setValue(max(1, round(info.fps)))
+
+        if hasattr(info, "width"):
+            self.widgets["width"].setValue(info.width)
+
+        if hasattr(info, "height"):
+            self.widgets["height"].setValue(info.height)
+
+        if hasattr(info, "video_bitrate") and info.video_bitrate:
+            bitrate_mbps = round(info.video_bitrate / 1_000_000)
+            self.widgets["bitrate"].setText(f"{bitrate_mbps}M")
 
     def init_ui(self):
         self.init_widgets()
@@ -151,9 +168,15 @@ class ConfigUI(QWidget):
         )
 
         if filepath:
-            # Store the selected path
             self.input_path = filepath
             print("Selected file:", filepath)
+
+            try:
+                info = vinfo(filepath)
+                self.apply_video_defaults(info)
+
+            except Exception as e:
+                print("Failed to load video info:", e)
 
     def _select_output(self):
         filepath, _ = QFileDialog.getSaveFileName(
