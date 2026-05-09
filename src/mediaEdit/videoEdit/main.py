@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from src.mediaEdit.videoEdit.ConfigQT.ConfigQT import ConfigUI
-from src.mediaEdit.videoEdit.VideoEditor.VideoEditor import VideoEditor
-from src.mediaEdit.videoEdit.VideoFormatter.VideoFormatter import MP4matter
+from src.mediaEdit.videoEdit.gui.config_ui import ConfigUI
+from src.mediaEdit.videoEdit.video_editor import VideoEditor
+from src.mediaEdit.videoEdit.video_formatter import MP4matter
 
 def main():
     app = QApplication(sys.argv)

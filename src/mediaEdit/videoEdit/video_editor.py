@@ -95,3 +95,5 @@ class VideoEditor:
     def close(self):
         """Release resources."""
         self.clip.close()
+
+

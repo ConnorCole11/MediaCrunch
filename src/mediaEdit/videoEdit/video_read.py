@@ -9,7 +9,6 @@ class VideoInfo:
         self.filepath = filepath
 
     def _get_ffprobe_info(self):
-        """Run ffprobe to get video information in JSON format"""
         cmd = [
             'ffprobe',
             '-v', 'error',
@@ -18,8 +17,9 @@ class VideoInfo:
             '-show_streams',
             self.filepath
         ]
+
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        return json.loads(result.stdout)
+        self.info = json.loads(result.stdout)
 
     def _parse_info(self):
         self.format_info = self.info.get('format', {})

@@ -7,7 +7,7 @@ from src.musicPlayer.GuiWindow.MainWindow import PlayerWindow
 from src.musicPlayer.GuiWindow.PlaylistPicker import PlaylistPicker
 from src.playlistEditor.makePlaylist.PlaylistGUI import PlaylistGUI
 from src.ytDownloader.YoutubeDownloader import YouTubeDownloader
-from src.mediaEdit.videoEdit.ConfigQT.ConfigQT import ConfigUI
+from src.mediaEdit.videoEdit.gui.config_ui import ConfigUI
 
 
 class TopLevelGUI(QWidget):
