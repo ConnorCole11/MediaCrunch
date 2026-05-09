@@ -1,10 +1,10 @@
 import sys, os, pygame
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from PyQt5.QtCore import QThread, pyqtSignal
-from src.musicPlayer.Player.Player import Player
-from src.musicPlayer.GuiWindow.headers import Headers
-from src.musicPlayer.GuiWindow.settings import Settings
-from src.musicPlayer.GuiWindow.song_window import SongWindow
+from src.music_player.player.player import Player
+from src.music_player.gui_window.headers import Headers
+from src.music_player.gui_window.settings import Settings
+from src.music_player.gui_window.song_window import SongWindow
 
 class PlayerThread(QThread):
     finished = pyqtSignal()

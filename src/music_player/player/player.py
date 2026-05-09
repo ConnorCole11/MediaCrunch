@@ -6,7 +6,7 @@ import pygame
 import random
 import time
 import os
-from src.musicPlayer.Player.PlayerState import PlayerState
+from src.music_player.player.player_state import PlayerState
 from pathlib import Path
 
 class Player(QObject):

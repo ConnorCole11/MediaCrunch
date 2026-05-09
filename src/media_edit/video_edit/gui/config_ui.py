@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import (
 import sys
 import os
 
-from src.mediaEdit.videoEdit.video_formatter import MP4matter as mp4mat
-from src.mediaEdit.videoEdit.video_read import VideoInfo as vinfo
-from src.mediaEdit.videoEdit.video_editor import VideoEditor as vedit
+from src.media_edit.video_edit.video_formatter import MP4matter as mp4mat
+from src.media_edit.video_edit.video_read import VideoInfo as vinfo
+from src.media_edit.video_edit.video_editor import VideoEditor as vedit
 
 
 class ConfigUI(QWidget):
@@ -34,7 +34,7 @@ class ConfigUI(QWidget):
     # =====================
     # INIT
     # =====================
-    def __init__(self, video_path: str):
+    def __init__(self, video_path: str = "storage/videos/WhatHappenedToMrPuff.mp4"):
         super().__init__()
 
         self.setWindowTitle("Video Config")

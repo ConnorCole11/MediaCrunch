@@ -6,7 +6,7 @@ except ImportError:
 # main.py (top-level entry point)
 import sys
 from PyQt5.QtWidgets import QApplication
-from src.MasterGUI import TopLevelGUI  # This is the master GUI with sidebar & playlist selector
+from src.master_gui import TopLevelGUI  # This is the master GUI with sidebar & playlist selector
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

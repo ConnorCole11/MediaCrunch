@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from src.musicPlayer.GuiWindow.MainWindow import PlayerWindow  # your new GUI class
+from src.music_player.gui_window.main_window import PlayerWindow  # your new GUI class
 import sys
 import os
 import pygame
