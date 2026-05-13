@@ -6,18 +6,19 @@ from PyQt5.QtCore import pyqtSignal
 import os
 
 
+
 class PlaylistPicker(QWidget):
     # Signal to send the selected playlist path back to the launcher
     playlistSelected = pyqtSignal(str)
 
-    def __init__(self, start_dir=None):
+    def __init__(self, config):
         """
         :param start_dir: Folder where the file dialog should open
         """
         super().__init__()
 
         # Default to home directory if none provided
-        self.start_dir = start_dir or os.path.expanduser("~")
+        self.playlist_folder = config.playlist_folder
 
         self.selected_playlist = None
 
@@ -40,7 +41,7 @@ class PlaylistPicker(QWidget):
         path, _ = QFileDialog.getOpenFileName(
             self,
             "Select Playlist File",
-            self.start_dir,
+            self.playlist_folder,
             "Text Files (*.txt);;All Files (*)"
         )
 

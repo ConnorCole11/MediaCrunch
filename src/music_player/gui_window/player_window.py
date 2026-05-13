@@ -9,6 +9,7 @@ from src.music_player.gui_window.song_window import SongWindow
 class PlayerThread(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str)
+    
 
     def __init__(self, player):
         super().__init__()
@@ -22,38 +23,17 @@ class PlayerThread(QThread):
         self.finished.emit()
 
 class PlayerWindow(QWidget):
+
+    back_to_picker = pyqtSignal()
+
     def __init__(self, playlist_file, song_folder):
         super().__init__()
 
-        # Player
-        self.player = Player(playlist_file, song_folder)
-        self.player.get_songs()
+        self._create_widgets(playlist_file, song_folder)
+        self._create_layouts()
+        self._connect_signals()
+
         pygame.mixer.init()
-
-        # Widgets
-        self.header_section = Headers()
-        self.song_section = SongWindow(self.player)
-        self.settings_section = Settings()
-
-        # Layout
-        main_layout = QVBoxLayout(self)
-        main_layout.addWidget(self.header_section)
-        main_layout.addWidget(self.song_section)
-        main_layout.addWidget(self.settings_section)
-        self.setWindowTitle("Music Player")
-
-        # Connect signals
-        self.settings_section.playClicked.connect(self.start_or_resume)
-        self.settings_section.pauseClicked.connect(self.pause)
-        self.settings_section.skipClicked.connect(self.skip)
-        self.settings_section.backClicked.connect(self.back)
-        self.settings_section.loopClicked.connect(self.loop)
-        self.settings_section.restartClicked.connect(self.restart)
-        self.settings_section.volume.sliderReleased.connect(self.commit_volume)
-        self.settings_section.shuffleClicked.connect(self.shuffle)
-
-        self.song_section.songClicked.connect(self.player.jump_to_song)
-        
 
         # Thread
         self.thread = PlayerThread(self.player)
@@ -65,7 +45,37 @@ class PlayerWindow(QWidget):
         )
         # self.settings_.shuffleChanged.connect(lambda _: self.song_section.set_songs(self.player.song_dirs))
 
-    # ----------------------
+    # -----------------------------
+    # Widgets, layouts, connections
+    # -----------------------------
+    def _create_widgets(self, playlist_file, song_folder):
+        self.player = Player(playlist_file, song_folder)
+        self.player.get_songs()
+
+        self.header_section = Headers()
+        self.song_section = SongWindow(self.player)
+        self.settings_section = Settings()
+
+    def _create_layouts(self):
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(self.header_section)
+        main_layout.addWidget(self.song_section)
+        main_layout.addWidget(self.settings_section)
+        self.setWindowTitle("Music Player")
+
+    def _connect_signals(self):
+        self.settings_section.playClicked.connect(self.start_or_resume)
+        self.settings_section.pauseClicked.connect(self.pause)
+        self.settings_section.skipClicked.connect(self.skip)
+        self.settings_section.backClicked.connect(self.back)
+        self.settings_section.loopClicked.connect(self.loop)
+        self.settings_section.restartClicked.connect(self.restart)
+        self.settings_section.volume.sliderReleased.connect(self.commit_volume)
+        self.settings_section.shuffleClicked.connect(self.shuffle)
+        self.settings_section.back_to_picker.connect(self.return_to_picker)
+
+        self.song_section.songClicked.connect(self.player.jump_to_song)
+
     # Button handlers
     # ----------------------
     def start_or_resume(self):
@@ -108,3 +118,6 @@ class PlayerWindow(QWidget):
 
     def thread_error(self, msg):
         print("Thread error:", msg)
+
+    def return_to_picker(self):
+        self.back_to_picker.emit()

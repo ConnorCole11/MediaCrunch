@@ -12,11 +12,32 @@ class Settings(QWidget):
     loopClicked = pyqtSignal()
     restartClicked = pyqtSignal()
     shuffleClicked = pyqtSignal()
+    back_to_picker = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+        # pygame.mixer.music.set_volume(0.5)
 
-        # Buttons
+
+        self._create_widgets()
+        self._create_layouts()
+        self._connect_signals()
+
+
+        # Volume slider
+        # self.volume = QSlider()
+        # self.volume.setOrientation(Qt.Horizontal)
+        # self.volume.setMinimum(0)
+        # self.volume.setMaximum(100)
+        # self.volume.setValue(50)
+        # self.volume.setTickInterval(10)
+        # self.volume.setTickPosition(QSlider.TicksBelow)
+
+
+
+
+
+    def _create_widgets(self):
         self.btn_play = QPushButton("▶ Play")
         self.btn_pause = QPushButton("⏸ Pause")
         self.btn_skip = QPushButton("⏭ Skip")
@@ -24,8 +45,28 @@ class Settings(QWidget):
         self.btn_restart = QPushButton("⭮ Restart")
         self.btn_loop = QPushButton("Loop")
         self.btn_shuffle = QPushButton("Shuffle")
+        self.volume = QSlider()
+        self.btn_return_to_picker = QPushButton("Return to Playlist Selection")
+    
+    def _create_layouts(self):
+        self.button_line = QHBoxLayout()
+        self.button_line.addWidget(self.btn_back)
+        self.button_line.addWidget(self.btn_loop)
+        self.button_line.addWidget(self.btn_restart)
+        self.button_line.addWidget(self.btn_pause)
+        self.button_line.addWidget(self.btn_play)
+        self.button_line.addWidget(self.btn_skip)
+        self.button_line.addWidget(self.btn_shuffle)
+        self._set_volume_layout()
+        
+        self.button_layout = QVBoxLayout()
+        self.button_layout.addLayout(self.button_line)
+        self.button_layout.addLayout(self.volume_layout)
+        self.button_layout.addWidget(self.btn_return_to_picker)
 
-        # Connect buttons
+        self.setLayout(self.button_layout)
+
+    def _connect_signals(self):
         self.btn_play.clicked.connect(self.playClicked.emit)
         self.btn_pause.clicked.connect(self.pauseClicked.emit)
         self.btn_skip.clicked.connect(self.skipClicked.emit)
@@ -33,33 +74,18 @@ class Settings(QWidget):
         self.btn_loop.clicked.connect(self.loopClicked.emit)
         self.btn_restart.clicked.connect(self.restartClicked.emit)
         self.btn_shuffle.clicked.connect(self.shuffleClicked.emit)
-
-        # Button layout (horizontal)
-        button_layout = QHBoxLayout()
-        button_layout.addWidget(self.btn_back)
-        button_layout.addWidget(self.btn_loop)
-        button_layout.addWidget(self.btn_restart)
-        button_layout.addWidget(self.btn_pause)
-        button_layout.addWidget(self.btn_play)
-        button_layout.addWidget(self.btn_skip)
-        button_layout.addWidget(self.btn_shuffle)
+        self.btn_return_to_picker.clicked.connect(self.back_to_picker)
 
 
-        # Volume slider
-        self.volume = QSlider()
+    def _set_volume_layout(self):
+        pygame.mixer.music.set_volume(0.5)
         self.volume.setOrientation(Qt.Horizontal)
         self.volume.setMinimum(0)
         self.volume.setMaximum(100)
         self.volume.setValue(50)
         self.volume.setTickInterval(10)
         self.volume.setTickPosition(QSlider.TicksBelow)
-        pygame.mixer.music.set_volume(0.5)
 
-        volume_layout = QHBoxLayout()
-        volume_layout.addWidget(QLabel("Volume:"))
-        volume_layout.addWidget(self.volume)
-
-        # Main layout (vertical)
-        main_layout = QVBoxLayout(self)
-        main_layout.addLayout(button_layout)
-        main_layout.addLayout(volume_layout)
+        self.volume_layout = QHBoxLayout()
+        self.volume_layout.addWidget(QLabel("Volume:"))
+        self.volume_layout.addWidget(self.volume)
