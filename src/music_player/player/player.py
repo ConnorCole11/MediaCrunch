@@ -15,8 +15,7 @@ class Player(QObject):
     """
     # Signals being sent:
     songChanged = pyqtSignal(int)
-    # pausedChanged = pyqtSignal(bool)
-    # shuffleChanged = pyqtSignal(bool)
+
 
     def __init__(self, playlist_file, song_folder):
         super().__init__()
@@ -71,7 +70,7 @@ class Player(QObject):
     def _play_song(self, mp3):
         """Load and play a single song."""
         pygame.mixer.music.load(mp3)
-        time.sleep(1)
+        # time.sleep(1)
         pygame.mixer.music.play()
         pygame.mixer.music.set_volume(self.ps.volume)
 
@@ -119,31 +118,29 @@ class Player(QObject):
 
         return i, pause_looped, False
 
+    def play_current(self):
 
-    def play_songs(self):
-        self.ps.current_idx = 0
-        pause_looped = False
+        song = self.song_dirs[self.ps.current_idx]
+        self.ps.current_song = song
+        pygame.mixer.music.load(song)
+        pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(self.ps.volume)
+        self.songChanged.emit(self.ps.current_idx)
 
-        while 0 <= self.ps.current_idx < len(self.song_dirs) and not self.ps.end:
-            self.ps.current_song = self.song_dirs[self.ps.current_idx]
-            self.songChanged.emit(self.ps.current_idx)
+    def next_song(self):
+        self.ps.current_idx += 1
+        if self.ps.current_idx >= len(self.song_dirs):
+            self.stop()
+            return
+        self.play_current()
 
-            self._play_song(self.song_dirs[self.ps.current_idx])
+    def previous_song(self):
+        self.ps.current_idx = max(0, self.ps.current_idx - 1)
+        self.play_current()
 
-            while (pygame.mixer.music.get_busy() or self.ps.pause_song or self.ps.loop) and not self.ps.end:
-                time.sleep(0.5)
-                new_i, pause_looped, action_taken = self._handle_playback_controls(
-                    self.ps.current_idx, pause_looped
-                )
-
-                if action_taken:
-                    self.ps.current_idx = new_i
-                    break
-
-            else:
-                # Only increment if no skip/back/jump happened
-                if not self.ps.loop:
-                    self.ps.current_idx += 1
+    def play_index(self, idx):
+        self.ps.current_idx = idx
+        self.play_current()
 
     def jump_to_song(self, song_path: str):
         index = self.song_dirs.index(song_path)
@@ -185,3 +182,15 @@ class Player(QObject):
 
     def idx(self, song_index: int): 
         self.ps.current_idx = song_index
+
+    def reset(self):
+        self.ps.set_default_state()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
+
+    def stop(self):
+        self.ps.end = True
+        self.ps.pause_song = False
+        self.ps.skip_song = False
+        self.ps.back_a_song = False
+        self.ps.jump_to_index = None

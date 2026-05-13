@@ -1,26 +1,71 @@
 import sys, os, pygame
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from src.music_player.player.player import Player
 from src.music_player.gui_window.headers import Headers
 from src.music_player.gui_window.settings import Settings
 from src.music_player.gui_window.song_window import SongWindow
 
-class PlayerThread(QThread):
+class PlaybackController(QThread):
+
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    
 
     def __init__(self, player):
         super().__init__()
+
         self.player = player
 
-    def run(self):
+        self.timer = QTimer()
+        self.timer.setInterval(200)
+
+        self.timer.timeout.connect(self.tick)
+    
+    def start(self):
+
+        if not self.player.song_dirs:
+            return
+        self.player.play_current()
+        self.timer.start()
+
+    def tick(self):
+        """The loop."""
         try:
-            self.player.play_songs()
+            if self.player.ps.end:
+                self.timer.stop()
+                self.finished.emit()
+                return
+
+            # skip
+            if self.player.ps.skip_song:
+                self.player.ps.skip_song = False
+                self.player.next_song()
+                return
+
+            # back
+            if self.player.ps.back_a_song:
+                self.player.ps.back_a_song = False
+                self.player.previous_song()
+                return
+
+            # jump
+            if self.player.ps.jump_to_index is not None:
+                idx = self.player.ps.jump_to_index
+                self.player.ps.jump_to_index = None
+                self.player.play_index(idx)
+                return
+
+            # song ended naturally
+            if not pygame.mixer.music.get_busy() and not self.player.ps.pause_song:
+                if self.player.ps.loop:
+                    self.player.play_current()
+                else:
+                    self.player.next_song()
         except Exception as e:
+            self.timer.stop()
             self.error.emit(str(e))
-        self.finished.emit()
+
+
 
 class PlayerWindow(QWidget):
 
@@ -33,17 +78,7 @@ class PlayerWindow(QWidget):
         self._create_layouts()
         self._connect_signals()
 
-        pygame.mixer.init()
 
-        # Player → headers
-        self.player.songChanged.connect(
-            lambda idx: self.header_section.set_title(os.path.basename(self.player.song_dirs[idx]))
-        )
-        # self.settings_.shuffleChanged.connect(lambda _: self.song_section.set_songs(self.player.song_dirs))
-
-    # -----------------------------
-    # Widgets, layouts, connections
-    # -----------------------------
     def _create_widgets(self, playlist_file, song_folder):
         self.player = Player(playlist_file, song_folder)
         self.player.get_songs()
@@ -53,7 +88,7 @@ class PlayerWindow(QWidget):
         self.settings_section = Settings()
 
         # Thread
-        self.my_thread = PlayerThread(self.player)
+        self.controller = PlaybackController(self.player)
 
     def _create_layouts(self):
         main_layout = QVBoxLayout(self)
@@ -74,13 +109,17 @@ class PlayerWindow(QWidget):
         self.settings_section.back_to_picker.connect(self.return_to_picker)
         self.song_section.songClicked.connect(self.player.jump_to_song)
 
-        self.my_thread.error.connect(self.thread_error)
+        self.controller.error.connect(self.thread_error)
+
+        self.player.songChanged.connect(
+            lambda idx: self.header_section.set_title(os.path.basename(self.player.song_dirs[idx]))
+        )
 
     # Button handlers
     # ----------------------
     def start_or_resume(self):
-        if not self.my_thread.isRunning():
-            self.my_thread.start()
+        if not self.controller.timer.isActive():
+            self.controller.start()
         else:
             self.player.unpause()
             pygame.mixer.music.unpause()
@@ -122,3 +161,14 @@ class PlayerWindow(QWidget):
 
     def return_to_picker(self):
         self.back_to_picker.emit()
+
+    def stop_and_reset(self):
+
+        self.controller.timer.stop()
+
+        self.player.stop()
+
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
+
+        self.player.reset()

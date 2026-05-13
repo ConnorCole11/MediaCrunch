@@ -6,6 +6,9 @@ class PlayerState:
     def __init__(self):
 
         # Initialize Values
+        self.set_default_state()
+
+    def set_default_state(self):
         self.loop = False
         self.end = False
         self.pause_song = False

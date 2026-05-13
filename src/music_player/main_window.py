@@ -8,6 +8,7 @@ try:
 except:
     from config import Config
 import sys
+import pygame
 
 class MainPlayerWindow(QWidget):
     
@@ -50,12 +51,12 @@ class MainPlayerWindow(QWidget):
         self.player_window.back_to_picker.connect(self._swap_to_picker)
 
     def _swap_to_picker(self):
-        self.stack.setCurrentWidget(self.playlist_picker)
+        self.stack.removeWidget(self.player_window)
+        self.player_window.stop_and_reset()
 
 
 
 if __name__ == "__main__":
-    import pygame
     pygame.mixer.init()
 
     config = Config()
