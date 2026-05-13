@@ -11,19 +11,24 @@ class SongWindow(QWidget):
         self.player = player
         self.highlight_color = "#00CCFF"
 
+        self._create_widgets()
+        self._create_layouts()
+        self._connect_signals()
+
+    def _create_widgets(self):
         self.playlist = QListWidget()
-        self.populate_songs()
+        self._populate_songs()
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.playlist)
+    def _create_layouts(self):
+        self.my_layout = QVBoxLayout(self)
+        self.my_layout.addWidget(self.playlist)
 
-        # connect double-click
+    def _connect_signals(self):
         self.playlist.itemDoubleClicked.connect(self.handle_double_click)
-
-        # connect to Player signals
         self.player.songChanged.connect(self.highlight_current_song)
 
-    def populate_songs(self):
+    def _populate_songs(self):
+        """Fill playlist QListWidget object with song buttons."""
         self.playlist.clear()
         for s in self.player.song_dirs:  # use current list
             item = QListWidgetItem(os.path.basename(s))

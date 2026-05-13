@@ -16,26 +16,29 @@ class PlaylistPicker(QWidget):
         :param start_dir: Folder where the file dialog should open
         """
         super().__init__()
-
-        # Default to home directory if none provided
         self.playlist_folder = config.playlist_folder
-
         self.selected_playlist = None
 
-        # UI
+        self._create_widgets()
+        self._create_layouts()
+        self._connect_signals()
+
+    def _create_widgets(self):
         self.label = QLabel("No playlist selected")
         self.btn_select = QPushButton("Select Playlist")
         self.btn_confirm = QPushButton("Confirm")
         self.btn_confirm.setEnabled(False)
 
+    def _create_layouts(self):
         layout = QVBoxLayout(self)
         layout.addWidget(self.label)
         layout.addWidget(self.btn_select)
         layout.addWidget(self.btn_confirm)
 
-        # Signals
+    def _connect_signals(self):
         self.btn_select.clicked.connect(self.choose_file)
         self.btn_confirm.clicked.connect(self.confirm_selection)
+
 
     def choose_file(self):
         path, _ = QFileDialog.getOpenFileName(

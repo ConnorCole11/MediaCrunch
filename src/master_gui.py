@@ -15,10 +15,14 @@ class TopLevelGUI(QWidget):
         self.setWindowTitle("Master GUI")
 
         self.config = config
+        
+        self._create_widgets()
+        self._create_layouts()
+        self._connect_signals()
+        self._configure_appearance()
 
-        # ------------------
-        # Sidebar
-        # ------------------
+    def _create_widgets(self):
+
         self.sidebar = QListWidget()
         self.sidebar.addItems([
             "Music Player",
@@ -27,41 +31,33 @@ class TopLevelGUI(QWidget):
             "mediaEdit"
         ])
         self.sidebar.setFixedWidth(200)
-        self.sidebar.currentRowChanged.connect(self.switch_gui)
 
-        # ------------------
-        # Central stack
-        # ------------------
-        self.stack = QStackedWidget()
-
-        # ------------------
-        # Sub-GUIs
-        # ------------------
-        self.main_player_window = MainPlayerWindow(config)
-        self.plistmaker = PlaylistGUI(config)
+        self.main_player_window = MainPlayerWindow(self.config)
+        self.plistmaker = PlaylistGUI(self.config)
         self.ytDownloader = YouTubeDownloader()
         self.mediaEditor = ConfigUI()
 
-        # ------------------
-        # Add initial widgets
-        # ------------------
-        self.stack.addWidget(self.main_player_window)  # index 0
+        # Start with Music Player tab
+        self.sidebar.setCurrentRow(0)
+
+    def _create_layouts(self):
+        self.stack = QStackedWidget()
+        self.stack.addWidget(self.main_player_window) # index 0
         self.stack.addWidget(self.plistmaker)         # index 1
         self.stack.addWidget(self.ytDownloader)       # index 2
         self.stack.addWidget(self.mediaEditor)        # index 3
 
-        # ------------------
-        # Layout
-        # ------------------
         layout = QHBoxLayout(self)
         layout.addWidget(self.sidebar)
         layout.addWidget(self.stack)
         self.setLayout(layout)
 
+    def _connect_signals(self):
+        self.sidebar.currentRowChanged.connect(self.switch_gui)
 
+    def _configure_appearance(self):
+        self.sidebar.setFixedWidth(200)
 
-        # Start with Music Player tab
-        self.sidebar.setCurrentRow(0)
 
     # ======================================================
     # Sidebar routing (STATE-AWARE)

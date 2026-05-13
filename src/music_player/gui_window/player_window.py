@@ -35,10 +35,6 @@ class PlayerWindow(QWidget):
 
         pygame.mixer.init()
 
-        # Thread
-        self.thread = PlayerThread(self.player)
-        self.thread.error.connect(self.thread_error)
-
         # Player → headers
         self.player.songChanged.connect(
             lambda idx: self.header_section.set_title(os.path.basename(self.player.song_dirs[idx]))
@@ -55,6 +51,9 @@ class PlayerWindow(QWidget):
         self.header_section = Headers()
         self.song_section = SongWindow(self.player)
         self.settings_section = Settings()
+
+        # Thread
+        self.my_thread = PlayerThread(self.player)
 
     def _create_layouts(self):
         main_layout = QVBoxLayout(self)
@@ -73,14 +72,15 @@ class PlayerWindow(QWidget):
         self.settings_section.volume.sliderReleased.connect(self.commit_volume)
         self.settings_section.shuffleClicked.connect(self.shuffle)
         self.settings_section.back_to_picker.connect(self.return_to_picker)
-
         self.song_section.songClicked.connect(self.player.jump_to_song)
+
+        self.my_thread.error.connect(self.thread_error)
 
     # Button handlers
     # ----------------------
     def start_or_resume(self):
-        if not self.thread.isRunning():
-            self.thread.start()
+        if not self.my_thread.isRunning():
+            self.my_thread.start()
         else:
             self.player.unpause()
             pygame.mixer.music.unpause()
@@ -102,6 +102,7 @@ class PlayerWindow(QWidget):
     def restart(self):
         self.player.restart()
         self.header_section.set_paused(False)
+        self.header_section.set_loop(False)
 
     def loop(self):
         self.player.tog_loop()

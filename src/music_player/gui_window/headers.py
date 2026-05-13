@@ -8,16 +8,21 @@ class Headers(QWidget):
     def __init__(self):
         super().__init__()
 
+        self._create_widgets()
+        self._create_layouts()
+
+    def _create_widgets(self):
         self.title = QLabel("No song selected. Select a song by double clicking.")
         self.paused = QLabel("Paused: ❌")
         self.looped = QLabel("Loop: ❌")
         self.shuffle_label = QLabel("Shuffle: ❌")
 
-        self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.title)
-        self.layout.addWidget(self.paused)
-        self.layout.addWidget(self.looped)
-        self.layout.addWidget(self.shuffle_label)
+    def _create_layouts(self):
+        self.my_layout = QVBoxLayout(self)
+        self.my_layout.addWidget(self.title)
+        self.my_layout.addWidget(self.paused)
+        self.my_layout.addWidget(self.looped)
+        self.my_layout.addWidget(self.shuffle_label)
 
     # slots (methods receiving signals)
     def set_title(self, name):

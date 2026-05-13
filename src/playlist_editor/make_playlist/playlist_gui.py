@@ -16,16 +16,13 @@ class PlaylistGUI(QWidget):
         self.songs_dir = config.song_folder
         self.playlist = None   # instance of ControlPlaylist
 
-        self.initWidgets()
-        self.initLayout()
-        self.initBuild()
+        self._create_widgets()
+        self._create_layouts()
+        self._connect_signals()
 
         self.refreshPlaylistList()
 
-    # -------------------------
-    # WIDGET SETUP
-    # -------------------------
-    def initWidgets(self):
+    def _create_widgets(self):
         self.setWindowTitle("Playlist Maker")
 
         # Playlist selector
@@ -36,11 +33,9 @@ class PlaylistGUI(QWidget):
         self.newPlaylistInput.setPlaceholderText("New playlist name")
         self.createPlaylistBtn = QPushButton("Create")
 
-        # Track list viewer
         self.trackList = QListWidget()
         self.trackList.setSelectionMode(self.trackList.SingleSelection)
 
-        # Buttons
         self.addSongBtn = QPushButton("Add Song")
         self.removeSongBtn = QPushButton("Remove Selected")
         self.upBtn = QPushButton("▲ Move Up")
@@ -52,10 +47,7 @@ class PlaylistGUI(QWidget):
         self.addFolderBtn = QPushButton("Add Folder")
 
 
-    # -------------------------
-    # LAYOUT SETUP
-    # -------------------------
-    def initLayout(self):
+    def _create_layouts(self):
         mainLayout = QVBoxLayout()
 
         # Playlist selection row
@@ -84,10 +76,7 @@ class PlaylistGUI(QWidget):
 
         self.setLayout(mainLayout)
 
-    # -------------------------
-    # SIGNALS & CALLBACKS
-    # -------------------------
-    def initBuild(self):
+    def _connect_signals(self):
         self.playlistCombo.currentIndexChanged.connect(self.loadSelectedPlaylist)
         self.createPlaylistBtn.clicked.connect(self.createPlaylist)
         self.addSongBtn.clicked.connect(self.addSong)

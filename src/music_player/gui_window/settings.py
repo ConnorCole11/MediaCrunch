@@ -16,26 +16,10 @@ class Settings(QWidget):
 
     def __init__(self):
         super().__init__()
-        # pygame.mixer.music.set_volume(0.5)
-
 
         self._create_widgets()
         self._create_layouts()
         self._connect_signals()
-
-
-        # Volume slider
-        # self.volume = QSlider()
-        # self.volume.setOrientation(Qt.Horizontal)
-        # self.volume.setMinimum(0)
-        # self.volume.setMaximum(100)
-        # self.volume.setValue(50)
-        # self.volume.setTickInterval(10)
-        # self.volume.setTickPosition(QSlider.TicksBelow)
-
-
-
-
 
     def _create_widgets(self):
         self.btn_play = QPushButton("▶ Play")
