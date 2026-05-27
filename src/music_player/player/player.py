@@ -95,7 +95,9 @@ class Player(QObject):
             self.ps.pause_song = False
             pygame.mixer.music.stop()
             self.ps.skip_n_songs = 1
-            return i + skip_amount, pause_looped, True
+            # return i + skip_amount, pause_looped, True
+            new_idx = (i + skip_amount) % len(self.song_dirs)
+            return new_idx, pause_looped, True
 
         # Back a song
         if self.ps.back_a_song:
@@ -128,10 +130,10 @@ class Player(QObject):
         self.songChanged.emit(self.ps.current_idx)
 
     def next_song(self):
-        self.ps.current_idx += 1
-        if self.ps.current_idx >= len(self.song_dirs):
-            self.stop()
-            return
+        self.ps.current_idx = (self.ps.current_idx + 1) % len(self.song_dirs)
+        # if self.ps.current_idx >= len(self.song_dirs):
+        #     self.stop()
+        #     return
         self.play_current()
 
     def previous_song(self):
