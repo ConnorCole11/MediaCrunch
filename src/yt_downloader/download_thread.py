@@ -31,6 +31,7 @@ class DownloadThread(QThread):
                 cmd = [
                     "yt-dlp",
                     "--cookies", str(self.cookies_path),
+                    "-t", "sleep",
                     "-x", "--audio-format", "mp3",
                     "-o", self.output_path,
                 ]
