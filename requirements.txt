@@ -8,8 +8,6 @@ pillow==11.3.0
 proglog==0.1.12
 pygame==2.6.1
 PyQt5==5.15.11
-PyQt5-Qt5==5.15.17
-PyQt5_sip==12.17.1
 python-dotenv==1.1.1
 tqdm==4.67.1
-yt-dlp==2025.10.22
+yt-dlp
