@@ -22,10 +22,19 @@ The long-term goal is to make it easy to manipulate and optimize videos and GIFs
 
 ## Requirements
 
-- Python 3.13
-- FFmpeg
-- macOS or Windows
-- Visual Studio Code is recommended for working with the source code
+- decorator==5.2.1
+- imageio==2.37.0
+- imageio-ffmpeg==0.6.0
+- moviepy==2.2.1
+- mutagen==1.47.0
+- numpy==2.3.4
+- pillow==11.3.0
+- proglog==0.1.12
+- pygame==2.6.1
+- PyQt5==5.15.11
+- python-dotenv==1.1.1
+- tqdm==4.67.1
+- yt-dlp
 
 ## Configuration
 
@@ -248,7 +257,7 @@ The video will be downloaded using the specified filename and output format.
 
 1. Paste the playlist's URL.
 
-   The playlist URL can be obtained by opening the playlist's list of videos on YouTube and clicking the playlist title at the top of the list. The usual YouTube sharing options will be available there.
+   The playlist URL can be obtained by opening the playlist's list of videos on YouTube and clicking the playlist title at the top of the list. The usual YouTube sharing options will be available there. If the playlsit is private, select "anyone with the link may view" so that FFMPEG has permission to find it.
 
 2. Select either `MP3` or `MP4` as the output format.
 

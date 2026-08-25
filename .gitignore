@@ -14,6 +14,7 @@ storage/
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache
 
 # Virtual environment
 venv*
@@ -26,6 +27,8 @@ venv*
 *.mp4
 *.avi
 *.mov
+*mp3
+playlists
 
 # Cookies file
 *cookies*
