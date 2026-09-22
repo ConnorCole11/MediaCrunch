@@ -2,11 +2,12 @@
 import os
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QPushButton,
-    QFileDialog, QComboBox, QLabel, QMessageBox, QLineEdit
+    QFileDialog, QComboBox, QLabel, QMessageBox, QLineEdit, QInputDialog
 )
 from PyQt5.QtCore import Qt
 
 from src.playlist_editor.make_playlist.control_playlist import ControlPlaylist
+from pathlib import Path
 
 
 class PlaylistGUI(QWidget):
@@ -20,18 +21,23 @@ class PlaylistGUI(QWidget):
         self._create_layouts()
         self._connect_signals()
 
-        self.refreshPlaylistList()
+        # self.refreshPlaylistList()
 
     def _create_widgets(self):
         self.setWindowTitle("Playlist Maker")
 
         # Playlist selector
-        self.playlistLabel = QLabel("Playlist:")
-        self.playlistCombo = QComboBox()
+        self.playlistLabel = QLabel(f"Selected Playlist: {self.playlist}")
+        # self.playlistCombo = QComboBox()
+        self.loadPlaylistBtn = QPushButton("Load Playlist")
+        self.file_dialog = QFileDialog()
+        self.file_dialog.setDirectory(self.playlists_dir)
 
-        self.newPlaylistInput = QLineEdit()
-        self.newPlaylistInput.setPlaceholderText("New playlist name")
-        self.createPlaylistBtn = QPushButton("Create")
+        # self.newPlaylistInput = QLineEdit()
+        # self.newPlaylistInput.setPlaceholderText("New playlist name")
+        self.createPlaylistBtn = QPushButton("Create Playlist")
+        # self.createPlaylistBtn = QInputDialog()
+        self.removePlaylistBtn = QPushButton("Remove Playlist")
 
         self.trackList = QListWidget()
         self.trackList.setSelectionMode(self.trackList.SingleSelection)
@@ -49,15 +55,20 @@ class PlaylistGUI(QWidget):
 
     def _create_layouts(self):
         mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.playlistLabel)
 
         # Playlist selection row
         row = QHBoxLayout()
-        row.addWidget(self.playlistLabel)
-        row.addWidget(self.playlistCombo)
+        # row.addWidget(self.playlistLabel)
+        # row.addWidget(self.playlistCombo)
+        # row.addWidget(self.file_dialog)
+        row.addWidget(self.loadPlaylistBtn)
 
         newRow = QHBoxLayout()
-        newRow.addWidget(self.newPlaylistInput)
         newRow.addWidget(self.createPlaylistBtn)
+        # newRow.addWidget(self.newPlaylistInput)
+        newRow.addWidget(self.createPlaylistBtn)
+        newRow.addWidget(self.removePlaylistBtn)
 
         # Track control buttons
         controlRow = QHBoxLayout()
@@ -77,7 +88,11 @@ class PlaylistGUI(QWidget):
         self.setLayout(mainLayout)
 
     def _connect_signals(self):
-        self.playlistCombo.currentIndexChanged.connect(self.loadSelectedPlaylist)
+        # self.playlistCombo.currentIndexChanged.connect(self.loadSelectedPlaylist)
+        # self.file_dialog.fileSelected.connect(self.loadSelectedPlaylist)
+        self.loadPlaylistBtn.clicked.connect(self.playlist_selection)
+        self.file_dialog.fileSelected.connect(self.loadSelectedPlaylist)
+        # self.createPlaylistBtn.clicked.connect(self.createPlaylist)
         self.createPlaylistBtn.clicked.connect(self.createPlaylist)
         self.addSongBtn.clicked.connect(self.addSong)
         self.addFolderBtn.clicked.connect(self.addFolder)
@@ -90,52 +105,82 @@ class PlaylistGUI(QWidget):
     # -------------------------
     # LOAD / SAVE LOGIC
     # -------------------------
-    def refreshPlaylistList(self):
-        self.playlistCombo.clear()
-        files = [f for f in os.listdir(self.playlists_dir) if f.endswith(".txt")]
-        self.playlistCombo.addItems(files)
+    # def refreshPlaylistList(self):
+    #     self.playlistCombo.clear()
+    #     files = [f for f in os.listdir(self.playlists_dir) if f.endswith(".txt")]
+    #     self.playlistCombo.addItems(files)
 
-    def loadSelectedPlaylist(self):
-        name = self.playlistCombo.currentText()
-        if not name:
-            return
+    def playlist_selection(self):
+        self.file_dialog.show()
 
+    def loadSelectedPlaylist(self, name):
+        basename = Path(name).name
         full_path = os.path.join(self.playlists_dir, name)
         self.playlist = ControlPlaylist(full_path, self.songs_dir)
+        self.playlistLabel.setText(f"Selected Playlist: {basename}")
 
         self.refreshTrackList()
 
     def refreshTrackList(self):
         self.trackList.clear()
+
         if self.playlist:
             for t in self.playlist.tracks:
-                self.trackList.addItem(t)
+                basename = Path(t).name
+                # self.trackList.addItem(t)
+                self.trackList.addItem(basename)
 
-    # -------------------------
-    # CREATE NEW PLAYLIST
-    # -------------------------
+
     def createPlaylist(self):
-        name = self.newPlaylistInput.text().strip()
-        if not name:
-            QMessageBox.warning(self, "Error", "Please enter a playlist name.")
-            return
+            name, ok = QInputDialog.getText(
+                self,
+                "New Playlist",
+                "Enter playlist name:"
+            )
 
-        filename = f"{name}_Playlist.txt"
-        full_path = os.path.join(self.playlists_dir, filename)
+            if not ok:
+                return
 
-        if os.path.exists(full_path):
-            QMessageBox.warning(self, "Exists", "Playlist already exists.")
-            return
+            name = name.strip()
 
-        # Create empty playlist
-        open(full_path, "w").close()
+            if not name:
+                QMessageBox.warning(
+                    self,
+                    "Error",
+                    "Please enter a valid playlist name."
+                )
+                return
 
-        self.refreshPlaylistList()
+            if name.lower().endswith(".txt"):
+                name = name[:-4]
 
-        # Select it
-        index = self.playlistCombo.findText(filename)
-        if index >= 0:
-            self.playlistCombo.setCurrentIndex(index)
+            # Make sure playlist directory exists
+            os.makedirs(self.playlists_dir, exist_ok=True)
+
+            filename = f"{name}.txt"
+            full_path = os.path.join(self.playlists_dir, filename)
+
+            if os.path.exists(full_path):
+                QMessageBox.warning(
+                    self,
+                    "Exists",
+                    "Playlist already exists."
+                )
+                return
+
+            try:
+                with open(full_path, "w") as f:
+                    pass
+            except OSError as e:
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Could not create playlist:\n{e}"
+                )
+                return
+
+            self.playlist = ControlPlaylist(full_path, self.songs_dir)
+            self.refreshTrackList()
 
     # -------------------------
     # MODIFY PLAYLIST CONTENT
@@ -151,6 +196,7 @@ class PlaylistGUI(QWidget):
             return
 
         self.playlist.add_track(file_path)
+        self.savePlaylist()
         self.refreshTrackList()
 
     def removeSelected(self):
@@ -159,6 +205,7 @@ class PlaylistGUI(QWidget):
             return
 
         self.playlist.remove_track(row)
+        self.savePlaylist()
         self.refreshTrackList()
 
     def moveUp(self):
@@ -167,6 +214,7 @@ class PlaylistGUI(QWidget):
             self.playlist.move_track(row, row - 1)
             self.refreshTrackList()
             self.trackList.setCurrentRow(row - 1)
+        self.savePlaylist()
 
     def moveDown(self):
         row = self.trackList.currentRow()
@@ -174,6 +222,7 @@ class PlaylistGUI(QWidget):
             self.playlist.move_track(row, row + 1)
             self.refreshTrackList()
             self.trackList.setCurrentRow(row + 1)
+        self.savePlaylist()
 
     def addFolder(self):
         folder_path = QFileDialog.getExistingDirectory(
@@ -204,7 +253,8 @@ class PlaylistGUI(QWidget):
         for filename in audio_files:
             full_path = os.path.join(folder_path, filename)
             self.playlist.add_track(full_path)
-
+        
+        self.savePlaylist()
         self.refreshTrackList()
 
 
@@ -215,4 +265,4 @@ class PlaylistGUI(QWidget):
     def savePlaylist(self):
         if self.playlist:
             self.playlist.save()
-            QMessageBox.information(self, "Saved", "Playlist saved successfully!")
+            # QMessageBox.information(self, "Saved", "Playlist saved successfully!")

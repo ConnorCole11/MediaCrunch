@@ -20,7 +20,11 @@ The long-term goal is to make it easy to manipulate and optimize videos and GIFs
 
 # Setup
 
-## Requirements
+## Environment Requirements
+
+- ffmpeg
+
+## Python Requirements
 
 - decorator==5.2.1
 - imageio==2.37.0
@@ -35,6 +39,73 @@ The long-term goal is to make it easy to manipulate and optimize videos and GIFs
 - python-dotenv==1.1.1
 - tqdm==4.67.1
 - yt-dlp
+
+## Downloading ffmpeg
+
+FFmpeg is a multimedia command-line tool that can manipulate and convert media files. It is needed to use `yt-dlp`, the command-line tool that downloads videos from YouTube.
+
+To download FFmpeg:
+
+### Mac
+
+If you have [Homebrew](https://brew.sh/) installed, run:
+
+    brew install ffmpeg
+
+Homebrew normally adds FFmpeg to your PATH automatically. Verify that it is available with:
+
+    ffmpeg -version
+
+If `ffmpeg` is not found, add Homebrew's binary directory to your PATH:
+
+    echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
+    source ~/.zshrc
+
+> **Note:** On Intel Macs, Homebrew is typically installed under `/usr/local` instead. In that case, use:
+
+    echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.zshrc
+    source ~/.zshrc
+
+You can check which Homebrew installation you have with:
+
+    brew --prefix
+
+### Windows
+
+Install FFmpeg using `winget`:
+
+    winget install Gyan.FFmpeg
+
+After installation, restart your terminal and check whether FFmpeg is available:
+
+    ffmpeg -version
+
+If `ffmpeg` is not recognized, add its `bin` directory to your PATH manually.
+
+#### Adding FFmpeg to PATH
+
+1. Open the **Start Menu** and search for **Environment Variables**.
+2. Select **Edit the system environment variables**.
+3. Click **Environment Variables...**
+4. Under **User variables**, select `Path` and click **Edit**.
+5. Click **New**.
+6. Add the path to FFmpeg's `bin` directory.
+
+If you installed FFmpeg with `winget`, the exact location can vary. You can find the installation location with:
+
+    winget list Gyan.FFmpeg
+
+Alternatively, search for `ffmpeg.exe` in File Explorer and add the folder containing it (the `bin` folder) to PATH.
+
+7. Click **OK** on all of the open dialogs.
+8. **Close and reopen your terminal.**
+
+Finally, verify the installation:
+
+    ffmpeg -version
+
+If the command prints FFmpeg's version information, FFmpeg is correctly installed and available on your PATH. Ensure that you start a new powershell before running MediaCrunch.
+
 
 ## Configuration
 

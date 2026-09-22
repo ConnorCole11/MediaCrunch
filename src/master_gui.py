@@ -34,7 +34,7 @@ class TopLevelGUI(QWidget):
 
         self.main_player_window = MainPlayerWindow(self.config)
         self.plistmaker = PlaylistGUI(self.config)
-        self.ytDownloader = YouTubeDownloader()
+        self.ytDownloader = YouTubeDownloader(self.config)
         self.mediaEditor = ConfigUI()
 
         # Start with Music Player tab

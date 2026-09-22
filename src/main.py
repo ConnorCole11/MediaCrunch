@@ -1,5 +1,5 @@
 try: 
-    from config_local import Config 
+    from local_config import Config 
 except ImportError: 
     from config import Config
 import pygame

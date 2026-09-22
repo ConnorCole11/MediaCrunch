@@ -8,7 +8,7 @@ class ControlPlaylist:
         """
         self.playlist_path = playlist_path
         self.songs_root = songs_root
-        self.tracks = []  # list of relative paths like "Xenoblade/Uraya_day_theme.mp3"
+        self.tracks = []  # list of relative paths from songs_root like "Pink_Floyd/time.mp3"
 
         if os.path.exists(playlist_path):
             self.load()

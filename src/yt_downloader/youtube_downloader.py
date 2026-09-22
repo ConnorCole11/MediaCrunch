@@ -11,9 +11,9 @@ from src.yt_downloader.download_thread import DownloadThread as DT
 
 
 class YouTubeDownloader(QWidget):
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
-
+        self.config = config
         self.setWindowTitle("YouTube Downloader")
         self.setGeometry(200, 200, 600, 400)
 
@@ -107,7 +107,8 @@ class YouTubeDownloader(QWidget):
     def browse_folder(self):
         folder = QFileDialog.getExistingDirectory(
             self,
-            "Select Download Folder"
+            "Select Download Folder",
+            self.config.storage_folder
         )
 
         if folder:
