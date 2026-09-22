@@ -16,6 +16,7 @@ class PlaylistGUI(QWidget):
         self.playlists_dir = config.playlist_folder
         self.songs_dir = config.song_folder
         self.playlist = None   # instance of ControlPlaylist
+    
 
         self._create_widgets()
         self._create_layouts()
@@ -32,12 +33,15 @@ class PlaylistGUI(QWidget):
         self.loadPlaylistBtn = QPushButton("Load Playlist")
         self.file_dialog = QFileDialog()
         self.file_dialog.setDirectory(self.playlists_dir)
+        self.remove_dialog = QFileDialog()
+        self.remove_dialog.setDirectory(self.playlists_dir)
 
         # self.newPlaylistInput = QLineEdit()
         # self.newPlaylistInput.setPlaceholderText("New playlist name")
-        self.createPlaylistBtn = QPushButton("Create Playlist")
+        self.createPlaylistBtn = QPushButton("Create a Playlist")
         # self.createPlaylistBtn = QInputDialog()
-        self.removePlaylistBtn = QPushButton("Remove Playlist")
+        self.removePlaylistBtn = QPushButton("Remove a Playlist")
+        
 
         self.trackList = QListWidget()
         self.trackList.setSelectionMode(self.trackList.SingleSelection)
@@ -94,6 +98,8 @@ class PlaylistGUI(QWidget):
         self.file_dialog.fileSelected.connect(self.loadSelectedPlaylist)
         # self.createPlaylistBtn.clicked.connect(self.createPlaylist)
         self.createPlaylistBtn.clicked.connect(self.createPlaylist)
+        self.removePlaylistBtn.clicked.connect(self.selectRemovePlaylist)
+        self.remove_dialog.fileSelected.connect(self.removePlaylist)
         self.addSongBtn.clicked.connect(self.addSong)
         self.addFolderBtn.clicked.connect(self.addFolder)
         self.removeSongBtn.clicked.connect(self.removeSelected)
@@ -132,55 +138,68 @@ class PlaylistGUI(QWidget):
 
 
     def createPlaylist(self):
-            name, ok = QInputDialog.getText(
+        name, ok = QInputDialog.getText(
+            self,
+            "New Playlist",
+            "Enter playlist name:"
+        )
+
+        if not ok:
+            return
+
+        name = name.strip()
+
+        if not name:
+            QMessageBox.warning(
                 self,
-                "New Playlist",
-                "Enter playlist name:"
+                "Error",
+                "Please enter a valid playlist name."
             )
+            return
 
-            if not ok:
-                return
+        if name.lower().endswith(".txt"):
+            name = name[:-4]
 
-            name = name.strip()
+        # Make sure playlist directory exists
+        os.makedirs(self.playlists_dir, exist_ok=True)
 
-            if not name:
-                QMessageBox.warning(
-                    self,
-                    "Error",
-                    "Please enter a valid playlist name."
-                )
-                return
+        filename = f"{name}.txt"
+        full_path = os.path.join(self.playlists_dir, filename)
 
-            if name.lower().endswith(".txt"):
-                name = name[:-4]
+        if os.path.exists(full_path):
+            QMessageBox.warning(
+                self,
+                "Exists",
+                "Playlist already exists."
+            )
+            return
 
-            # Make sure playlist directory exists
-            os.makedirs(self.playlists_dir, exist_ok=True)
+        try:
+            with open(full_path, "w") as f:
+                pass
+        except OSError as e:
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Could not create playlist:\n{e}"
+            )
+            return
 
-            filename = f"{name}.txt"
-            full_path = os.path.join(self.playlists_dir, filename)
+        self.playlist = ControlPlaylist(full_path, self.songs_dir)
+        self.refreshTrackList()
 
-            if os.path.exists(full_path):
-                QMessageBox.warning(
-                    self,
-                    "Exists",
-                    "Playlist already exists."
-                )
-                return
+    def selectRemovePlaylist(self):
+        self.remove_dialog.show()
+    
+    def removePlaylist(self, filepath):
+        basename = Path(filepath).name
+        Path(filepath).unlink()
+        QMessageBox.information(None, "Success", f"Deleted {basename}")
+        if self.playlist != None:
+            if self.playlist.playlist_path == basename:
+                self.playlist = None
 
-            try:
-                with open(full_path, "w") as f:
-                    pass
-            except OSError as e:
-                QMessageBox.critical(
-                    self,
-                    "Error",
-                    f"Could not create playlist:\n{e}"
-                )
-                return
 
-            self.playlist = ControlPlaylist(full_path, self.songs_dir)
-            self.refreshTrackList()
 
     # -------------------------
     # MODIFY PLAYLIST CONTENT

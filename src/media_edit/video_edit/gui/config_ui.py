@@ -64,7 +64,8 @@ class ConfigUI(QWidget):
             self.apply_video_defaults(info)
 
         except Exception as e:
-            print("Failed to load video info:", e)
+            # print("Failed to load video info:", e)
+            pass
 
     def apply_video_defaults(self, info: dict):
         video = info.get("video", {})
